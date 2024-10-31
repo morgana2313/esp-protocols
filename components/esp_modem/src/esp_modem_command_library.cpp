@@ -270,9 +270,14 @@ command_result get_operator_name(CommandableIf *t, std::string &operator_name, i
     return command_result::FAIL;
 }
 
+#include "esp_debug_helpers.h"
+
 command_result set_echo(CommandableIf *t, bool on)
 {
     ESP_LOGV(TAG, "%s", __func__ );
+    // ESP_LOGI(TAG, "%s %d", __func__, (int) on);
+    // esp_backtrace_print(20);
+
     if (on) {
         return generic_command_common(t, "ATE1\r");
     }
@@ -372,8 +377,11 @@ command_result send_sms(CommandableIf *t, const std::string &number, const std::
 
 command_result set_cmux(CommandableIf *t)
 {
+    ESP_LOGE("esp_modem_command_library.cpp:set_cmux", "set_cmux0");
     ESP_LOGV(TAG, "%s", __func__ );
-    return generic_command_common(t, "AT+CMUX=0\r");
+    command_result result =  generic_command_common(t, "AT+CMUX=0,0,5,1500\r");
+    ESP_LOGE("esp_modem_command_library.cpp:set_cmux", "set_cmux result: %d", (int) result);
+    return result;
 }
 
 command_result read_pin(CommandableIf *t, bool &pin_ok)

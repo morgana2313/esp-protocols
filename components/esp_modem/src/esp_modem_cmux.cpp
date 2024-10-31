@@ -121,6 +121,9 @@ struct CMux::CMuxFrame {
 
 bool CMux::data_available(uint8_t *data, size_t len)
 {
+    // static const char *TAG="esp_modem_cmux.cpp:CMux::data_available";
+    // ESP_LOGW("", "%s:%d:%s(): ",  __FILE__, __LINE__, __func__);
+
     if (data && (type & FT_UIH) == FT_UIH && len > 0 && dlci > 0) { // valid payload on a virtual term
         int virtual_term = dlci - 1;
         if (virtual_term < MAX_TERMINALS_NUM && read_cb[virtual_term]) {
@@ -138,6 +141,7 @@ bool CMux::data_available(uint8_t *data, size_t len)
             return false;
         }
     } else if (data == nullptr && type == (FT_UA | PF) && len == 0) { // notify the initial SABM command
+        // ESP_LOGE(TAG, "AHUM1 sabm_ack=%d", (int) dlci);
         Scoped<Lock> l(lock);
         sabm_ack = dlci;
     } else if (data == nullptr && dlci > 0) {
@@ -423,6 +427,9 @@ bool CMux::deinit()
 
 bool CMux::init()
 {
+    // static const char *TAG = __FILE__ " CMux::init";
+    // ESP_LOGW("", "%s:%d:%s(): ",  __FILE__, __LINE__, __func__);
+
     frame_header_offset = 0;
     state = cmux_state::INIT;
     term->set_read_cb([this](uint8_t *data, size_t len) {
@@ -430,9 +437,13 @@ bool CMux::init()
         return false;
     });
 
+    // ESP_LOGW("", "%s:%d:%s(): 500msec delay ",  __FILE__, __LINE__, __func__);
+    // usleep(500'000);
+
     sabm_ack = -1;
     for (size_t i = 0; i < 3; i++) {
         int timeout = 0;
+        // ESP_LOGE(TAG, "send_sabm %i", i);
         send_sabm(i);
         while (true) {
             usleep(10'000);
@@ -441,7 +452,8 @@ bool CMux::init()
                 sabm_ack = -1;
                 break;
             }
-            if (timeout++ > 100) {
+            if (timeout++ > 500) {
+                // ESP_LOGE(TAG, "timeout.");
                 return false;
             }
         }

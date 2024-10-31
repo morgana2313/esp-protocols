@@ -50,6 +50,8 @@ public:
      */
     bool setup_data_mode() override
     {
+        // ESP_LOGW("", "%s:%d:%s(): ",  __FILE__, __LINE__, __func__);
+
         if (set_echo(false) != command_result::OK) {
             return false;
         }
@@ -65,6 +67,7 @@ public:
      */
     bool set_mode(modem_mode mode) override
     {
+        ESP_LOGI("esp_modem_dce_module.hpp", "set_mode: %d", (int) mode);
         if (mode == modem_mode::DATA_MODE) {
             if (set_data_mode() != command_result::OK) {
                 return resume_data_mode() == command_result::OK;

@@ -3,5 +3,11 @@
 cmake_minimum_required(VERSION 3.8)
 set(CMAKE_CXX_STANDARD 17)
 
+set(COMPONENTS
+    main
+)
+
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+include($ENV{HOME}/mp-v5-flexy/sn-idf/sn.cmake)
+
 project(modem-console)

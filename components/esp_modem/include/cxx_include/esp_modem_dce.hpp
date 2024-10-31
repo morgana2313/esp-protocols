@@ -81,6 +81,7 @@ public:
 
     bool set_mode(modem_mode m)
     {
+        // ESP_LOGW("", "%s:%d:%s(): ", __FILE__, __LINE__, __func__);
         return mode.set(dte.get(), device.get(), netif, m);
     }
 

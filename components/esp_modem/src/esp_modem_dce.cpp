@@ -60,6 +60,7 @@ static bool exit_data(DTE &dte, ModuleIf &device, Netif &netif)
 
 static bool enter_data(DTE &dte, ModuleIf &device, Netif &netif)
 {
+    // ESP_LOGW("", "%s:%d:%s(): ",  __FILE__, __LINE__, __func__);
     if (!device.setup_data_mode()) {
         return false;
     }
@@ -80,6 +81,7 @@ static bool enter_data(DTE &dte, ModuleIf &device, Netif &netif)
 */
 bool DCE_Mode::set(DTE *dte, ModuleIf *device, Netif &netif, modem_mode m)
 {
+    // ESP_LOGW("", "%s:%d:%s(): ",  __FILE__, __LINE__, __func__);
     Scoped<DTE> lock(*dte);
     return set_unsafe(dte, device, netif, m);
 }
@@ -135,12 +137,16 @@ bool DCE_Mode::set_unsafe(DTE *dte, ModuleIf *device, Netif &netif, modem_mode m
         if (mode == modem_mode::DATA_MODE || mode == modem_mode::CMUX_MODE || mode >= modem_mode::CMUX_MANUAL_MODE) {
             return false;
         }
-        device->set_mode(modem_mode::CMUX_MODE);    // switch the device into CMUX mode
+        if (!device->set_mode(modem_mode::CMUX_MODE))    // switch the device into CMUX mode
+        {
+            return false;
+        }
         usleep(100'000);                            // some devices need a few ms to switch
 
         if (!dte->set_mode(modem_mode::CMUX_MODE)) {
             return false;
         }
+        // ESP_LOGW("", "%s:%d:%s(): ",  __FILE__, __LINE__, __func__);
         mode = modem_mode::CMUX_MODE;
         return transitions::enter_data(*dte, *device, netif);
     case modem_mode::CMUX_MANUAL_MODE:

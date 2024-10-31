@@ -68,7 +68,9 @@ void ConsoleCommand::RegisterCommand(const char *command, const char *help, cons
         .help = help,
         .hint = nullptr,
         .func = command_func_pts[last_command],
-        .argtable = &arg_table[0]
+        .argtable = &arg_table[0],
+        .func_w_context = nullptr,
+        .context = nullptr
     };
     ESP_ERROR_CHECK(esp_console_cmd_register(&command_def));
     last_command++;

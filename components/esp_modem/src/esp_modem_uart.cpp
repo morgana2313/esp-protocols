@@ -175,13 +175,18 @@ int UartTerminal::read(uint8_t *data, size_t len)
     uart_get_buffered_data_len(uart.port, &length);
     length = std::min(len, length);
     if (length > 0) {
-        return uart_read_bytes(uart.port, data, length, portMAX_DELAY);
+        int read_len = uart_read_bytes(uart.port, data, length, portMAX_DELAY);
+        data[read_len] = 0;
+        // ESP_LOGI("rx", "%p [%s]", data, data);
+        // ESP_LOG_BUFFER_HEXDUMP("RX", data, read_len, ESP_LOG_INFO);
+        return read_len;
     }
     return 0;
 }
 
 int UartTerminal::write(uint8_t *data, size_t len)
 {
+    // ESP_LOG_BUFFER_HEXDUMP("TX", data, len, ESP_LOG_INFO);
     return uart_write_bytes_compat(uart.port, data, len);
 }
 
